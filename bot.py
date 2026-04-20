@@ -1,11 +1,18 @@
 import os
-import pandas as pd
+import csv
+import gzip
+from flask import Flask, request
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes
-from flask import Flask, request
 
-# carregar dados já processados
-df = pd.read_csv("dados_processados.csv.gz")
+# -----------------------------
+# CARREGAR DADOS SEM PANDAS
+# -----------------------------
+dados = []
+with gzip.open("dados_processados.csv.gz", "rt", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        dados.append(row)
 
 # -----------------------------
 # FUNÇÃO DE CONSULTA
@@ -15,31 +22,32 @@ def consultar(texto):
         partes = [p.strip() for p in texto.split(",")]
         municipio = partes[0]
         uf = partes[1]
-        ano = int(partes[2]) if len(partes) > 2 else 2024
+        ano = partes[2].strip() if len(partes) > 2 else "2024"
     except:
         return (
             "Formato inválido.\n\n"
-            "Use:\n"
-            "Cidade, UF\n"
-            "ou\n"
-            "Cidade, UF, ano\n\n"
+            "Use:\nCidade, UF\nou\nCidade, UF, ano\n\n"
             "Ex: Campinas, SP, 2000"
         )
-    filtro = (
-        (df["municipality"].str.lower() == municipio.lower()) &
-        (df["state_acronym"].str.upper() == uf.upper()) &
-        (df["year"] == ano)
-    )
-    dados = df[filtro]
-    if dados.empty:
+
+    filtrados = [
+        r for r in dados
+        if r["municipality"].lower() == municipio.lower()
+        and r["state_acronym"].upper() == uf.upper()
+        and r["year"] == ano
+    ]
+
+    if not filtrados:
         return "Município ou ano não encontrado."
-    total = dados["area_ha"].sum()
-    dados = dados.sort_values(by="area_ha", ascending=False)
+
+    total = sum(float(r["area_ha"]) for r in filtrados)
+    filtrados.sort(key=lambda r: float(r["area_ha"]), reverse=True)
+
     resposta = f"📍 {municipio} ({uf}) - {ano}\n"
     resposta += "Fonte: MapBiomas – Coleção 10\n\n"
-    for _, row in dados.iterrows():
-        perc = (row["area_ha"] / total) * 100
-        resposta += f"{row['class_level_4']}: {perc:.1f}%\n"
+    for r in filtrados:
+        perc = (float(r["area_ha"]) / total) * 100
+        resposta += f"{r['class_level_4']}: {perc:.1f}%\n"
     return resposta
 
 # -----------------------------
@@ -95,9 +103,6 @@ async def webhook():
 def index():
     return "Bot online!"
 
-# -----------------------------
-# INICIALIZAÇÃO
-# -----------------------------
 import asyncio
 
 async def main():

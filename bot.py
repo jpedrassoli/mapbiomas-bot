@@ -12,7 +12,13 @@ dados = []
 with gzip.open("dados_processados.csv.gz", "rt", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     for row in reader:
-        dados.append(row)
+        dados.append({
+            "municipality": row["municipality"],
+            "state_acronym": row["state_acronym"],
+            "year": row["year"],
+            "area_ha": float(row["area_ha"]),
+            "class_level_4": row["class_level_4"]
+        })
 
 # -----------------------------
 # FUNÇÃO DE CONSULTA
@@ -40,13 +46,13 @@ def consultar(texto):
     if not filtrados:
         return "Município ou ano não encontrado."
 
-    total = sum(float(r["area_ha"]) for r in filtrados)
-    filtrados.sort(key=lambda r: float(r["area_ha"]), reverse=True)
+    total = sum(r["area_ha"] for r in filtrados)
+    filtrados.sort(key=lambda r: r["area_ha"], reverse=True)
 
     resposta = f"📍 {municipio} ({uf}) - {ano}\n"
     resposta += "Fonte: MapBiomas – Coleção 10\n\n"
     for r in filtrados:
-        perc = (float(r["area_ha"]) / total) * 100
+        perc = (r["area_ha"] / total) * 100
         resposta += f"{r['class_level_4']}: {perc:.1f}%\n"
     return resposta
 

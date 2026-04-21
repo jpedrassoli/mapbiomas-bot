@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import asyncio
+import threading
 import gdown
 from flask import Flask, request
 from telegram import Update
@@ -85,6 +86,18 @@ async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(resposta)
 
 # -----------------------------
+# LOOP PERSISTENTE EM BACKGROUND
+# -----------------------------
+loop = asyncio.new_event_loop()
+
+def start_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+thread = threading.Thread(target=start_loop, args=(loop,), daemon=True)
+thread.start()
+
+# -----------------------------
 # FLASK + WEBHOOK
 # -----------------------------
 TOKEN = os.getenv("TELEGRAM_TOKEN")
@@ -96,13 +109,12 @@ bot_app = ApplicationBuilder().token(TOKEN).build()
 bot_app.add_handler(CommandHandler("start", start))
 bot_app.add_handler(MessageHandler(filters.TEXT, responder))
 
-# Inicializa tudo em uma única chamada async
 async def setup():
     await bot_app.initialize()
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/{TOKEN}")
     print("Webhook configurado!")
 
-asyncio.run(setup())
+asyncio.run_coroutine_threadsafe(setup(), loop).result()
 
 # -----------------------------
 # ROTA DO WEBHOOK
@@ -110,7 +122,7 @@ asyncio.run(setup())
 @flask_app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(), bot_app.bot)
-    asyncio.run(bot_app.process_update(update))
+    asyncio.run_coroutine_threadsafe(bot_app.process_update(update), loop)
     return "OK"
 
 @flask_app.route("/")

@@ -8,6 +8,45 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes
 
 # -----------------------------
+# TRADUÇÃO DAS CLASSES
+# -----------------------------
+CLASSES_PT = {
+    "Forest Formation": "Formação Florestal",
+    "Savanna Formation": "Formação Savânica",
+    "Mangrove": "Mangue",
+    "Floodable Forest": "Floresta Alagável",
+    "Wooded Sandbank Vegetation": "Restinga Arbórea",
+    "Wetland": "Campo Alagado e Área Pantanosa",
+    "Grassland": "Formação Campestre",
+    "Hypersaline Tidal Flat": "Apicum",
+    "Rocky Outcrop": "Afloramento Rochoso",
+    "Herbaceous Sandbank Vegetation": "Restinga Herbácea",
+    "Pasture": "Pastagem",
+    "Agriculture": "Agricultura",
+    "Temporary Crop": "Lavoura Temporária",
+    "Soybean": "Soja",
+    "Sugar cane": "Cana",
+    "Rice": "Arroz",
+    "Cotton (beta)": "Algodão (beta)",
+    "Other Temporary Crops": "Outras Lavouras Temporárias",
+    "Perennial Crop": "Lavoura Perene",
+    "Coffee": "Café",
+    "Citrus": "Citrus",
+    "Palm Oil": "Dendê",
+    "Other Perennial Crops": "Outras Lavouras Perenes",
+    "Forest Plantation": "Silvicultura",
+    "Mosaic of Uses": "Mosaico de Usos",
+    "Beach, Dune and Sand Spot": "Praia, Duna e Areal",
+    "Urban Area": "Área Urbanizada",
+    "Mining": "Mineração",
+    "Photovoltaic Power Plant (beta)": "Usina Fotovoltaica (beta)",
+    "Other non Vegetated Areas": "Outras Áreas não Vegetadas",
+    "River, Lake and Ocean": "Rio, Lago e Oceano",
+    "Aquaculture": "Aquicultura",
+    "Not Observed": "Não observado",
+}
+
+# -----------------------------
 # BAIXAR DADOS DO GOOGLE DRIVE
 # -----------------------------
 if not os.path.exists("dados.db"):
@@ -52,10 +91,11 @@ def consultar(texto):
     resposta += "Fonte: MapBiomas – Coleção 10\n\n"
     for classe, area in rows:
         perc = (area / total) * 100
-        resposta += f"{classe}: {perc:.1f}% ({area:.1f} ha)\n"
+        nome = CLASSES_PT.get(classe, classe)
+        resposta += f"{nome}: {perc:.1f}% ({area:.1f} ha)\n"
     resposta += f"\n🗺️ Área Total: {total:.1f} ha"
     return resposta
-    
+
 # -----------------------------
 # COMANDO /start
 # -----------------------------

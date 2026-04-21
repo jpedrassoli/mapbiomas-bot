@@ -52,9 +52,10 @@ def consultar(texto):
     resposta += "Fonte: MapBiomas – Coleção 10\n\n"
     for classe, area in rows:
         perc = (area / total) * 100
-        resposta += f"{classe}: {perc:.1f}%\n"
+        resposta += f"{classe}: {perc:.1f}% ({area:.1f} ha)\n"
+    resposta += f"\n🗺️ Área Total: {total:.1f} ha"
     return resposta
-
+    
 # -----------------------------
 # COMANDO /start
 # -----------------------------

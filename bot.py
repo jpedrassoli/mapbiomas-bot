@@ -1,24 +1,20 @@
 import os
-import csv
-import gzip
+import sqlite3
+import gdown
 from flask import Flask, request
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes
 
 # -----------------------------
-# CARREGAR DADOS SEM PANDAS
+# BAIXAR DADOS DO GOOGLE DRIVE
 # -----------------------------
-dados = []
-with gzip.open("dados_processados.csv.gz", "rt", encoding="utf-8") as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        dados.append({
-            "municipality": row["municipality"],
-            "state_acronym": row["state_acronym"],
-            "year": row["year"],
-            "area_ha": float(row["area_ha"]),
-            "class_level_4": row["class_level_4"]
-        })
+if not os.path.exists("dados.db"):
+    print("Baixando dados.db do Google Drive...")
+    gdown.download(
+        "https://drive.google.com/uc?id=18j-3I7VukvW47O1jd7crlsP1UQw9u1GJ",
+        "dados.db", quiet=False
+    )
+    print("Download concluído!")
 
 # -----------------------------
 # FUNÇÃO DE CONSULTA
@@ -36,24 +32,25 @@ def consultar(texto):
             "Ex: Campinas, SP, 2000"
         )
 
-    filtrados = [
-        r for r in dados
-        if r["municipality"].lower() == municipio.lower()
-        and r["state_acronym"].upper() == uf.upper()
-        and r["year"] == ano
-    ]
+    conn = sqlite3.connect("dados.db")
+    cursor = conn.execute(
+        "SELECT class_level_4, area_ha FROM cobertura "
+        "WHERE LOWER(municipality)=LOWER(?) AND UPPER(state_acronym)=UPPER(?) AND year=? "
+        "ORDER BY area_ha DESC",
+        (municipio, uf, ano)
+    )
+    rows = cursor.fetchall()
+    conn.close()
 
-    if not filtrados:
+    if not rows:
         return "Município ou ano não encontrado."
 
-    total = sum(r["area_ha"] for r in filtrados)
-    filtrados.sort(key=lambda r: r["area_ha"], reverse=True)
-
+    total = sum(r[1] for r in rows)
     resposta = f"📍 {municipio} ({uf}) - {ano}\n"
     resposta += "Fonte: MapBiomas – Coleção 10\n\n"
-    for r in filtrados:
-        perc = (r["area_ha"] / total) * 100
-        resposta += f"{r['class_level_4']}: {perc:.1f}%\n"
+    for classe, area in rows:
+        perc = (area / total) * 100
+        resposta += f"{classe}: {perc:.1f}%\n"
     return resposta
 
 # -----------------------------

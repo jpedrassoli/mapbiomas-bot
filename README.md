@@ -1,8 +1,7 @@
 <p align="left">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Webysther_20160322_-_Logo_USP.svg/1280px-Webysther_20160322_-_Logo_USP.svg.png" height="50"/>
+  <img src="https://scs.usp.br/identidadevisual/wp-content/uploads/2022/08/usp-logo-png-768x576.png" height="50"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="[https://upload.wikimedia.org/wikipedia/pt/3/38/Logo_FFLCH-USP.png](https://yt3.googleusercontent.com/ytc/AIdro_kdIOhaVaPTwWLKGisjR4sKj9k8-hTPc_VJeGcKSdaB02w=s900-c-k-c0x00ffffff-no-rj)" height="50"/>
-</p>
+  </p>
 
 # MapBiomas Bot
 

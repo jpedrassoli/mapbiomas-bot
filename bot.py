@@ -96,10 +96,10 @@ bot_app.add_handler(CommandHandler("start", start))
 bot_app.add_handler(MessageHandler(filters.TEXT, responder))
 
 @flask_app.route(f"/{TOKEN}", methods=["POST"])
-async def webhook():
-    await bot_app.initialize()
+def webhook():
+    import asyncio
     update = Update.de_json(request.get_json(), bot_app.bot)
-    await bot_app.process_update(update)
+    asyncio.run(bot_app.process_update(update))
     return "OK"
 
 @flask_app.route("/")

@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import asyncio
 import gdown
 from flask import Flask, request
 from telegram import Update
@@ -95,9 +96,16 @@ bot_app = ApplicationBuilder().token(TOKEN).build()
 bot_app.add_handler(CommandHandler("start", start))
 bot_app.add_handler(MessageHandler(filters.TEXT, responder))
 
+# Inicializa e configura o webhook
+asyncio.run(bot_app.initialize())
+asyncio.run(bot_app.bot.set_webhook(f"{WEBHOOK_URL}/{TOKEN}"))
+print("Webhook configurado!")
+
+# -----------------------------
+# ROTA DO WEBHOOK
+# -----------------------------
 @flask_app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
-    import asyncio
     update = Update.de_json(request.get_json(), bot_app.bot)
     asyncio.run(bot_app.process_update(update))
     return "OK"
@@ -106,14 +114,9 @@ def webhook():
 def index():
     return "Bot online!"
 
-import asyncio
-
-async def main():
-    await bot_app.initialize()
-    await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/{TOKEN}")
-    print("Webhook configurado!")
-
+# -----------------------------
+# INICIALIZAÇÃO
+# -----------------------------
 if __name__ == "__main__":
-    asyncio.run(main())
     port = int(os.environ.get("PORT", 8080))
     flask_app.run(host="0.0.0.0", port=port)

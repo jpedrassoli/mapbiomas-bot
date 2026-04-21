@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="https://scs.usp.br/identidadevisual/wp-content/uploads/2022/08/usp-logo-png-768x576.png" height="50"/>
+  <img src="https://scs.usp.br/identidadevisual/wp-content/uploads/2022/08/usp-logo-png-768x576.png" height="100"/>
   &nbsp;&nbsp;&nbsp;
   </p>
 

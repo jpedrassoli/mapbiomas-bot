@@ -96,10 +96,13 @@ bot_app = ApplicationBuilder().token(TOKEN).build()
 bot_app.add_handler(CommandHandler("start", start))
 bot_app.add_handler(MessageHandler(filters.TEXT, responder))
 
-# Inicializa e configura o webhook
-asyncio.run(bot_app.initialize())
-asyncio.run(bot_app.bot.set_webhook(f"{WEBHOOK_URL}/{TOKEN}"))
-print("Webhook configurado!")
+# Inicializa tudo em uma única chamada async
+async def setup():
+    await bot_app.initialize()
+    await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/{TOKEN}")
+    print("Webhook configurado!")
+
+asyncio.run(setup())
 
 # -----------------------------
 # ROTA DO WEBHOOK

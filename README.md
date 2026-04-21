@@ -14,6 +14,8 @@
 
 Bot para o Telegram que permite consultar a distribuição de **uso e cobertura da terra** em municípios brasileiros, com base nos dados da **Coleção 10 do MapBiomas Brasil**.
 
+Para usar no Telegram, procure por @mapbiomas_bot
+
 Desenvolvido no âmbito do **Departamento de Geografia da Universidade de São Paulo (USP)**.
 
 ---

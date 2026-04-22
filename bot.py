@@ -224,6 +224,7 @@ REGRAS OBRIGATÓRIAS:
 - Não mencione eventos históricos, políticas públicas ou contexto externo.
 - Seja conciso: no máximo 5 frases.
 - Escreva em português.
+- Ao final inclua uma frase concisa iniciada por "Segundo a análise do Llama 3.1", seguida de uma análise de contexto baseada nos dados, indicando o processo de mudança de uso da terra predominante.
 
 DADOS DE COBERTURA EM 1985:
 {formatar_dados_para_llm(rows_1985)}

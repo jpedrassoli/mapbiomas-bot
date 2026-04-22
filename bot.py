@@ -301,7 +301,7 @@ thread.start()
 # -----------------------------
 # FLASK + WEBHOOK
 # -----------------------------
-TOKEN       = os.getenv("TELEGRAM_TOKEN_TEST")
+TOKEN       = os.getenv("TELEGRAM_TOKEN")
 WEBHOOK_URL = "https://mapbiomas-bot-test.onrender.com"
 
 flask_app = Flask(__name__)
